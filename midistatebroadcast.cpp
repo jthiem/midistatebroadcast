@@ -28,7 +28,7 @@
 
 bool done;
 static void finish( int ignore ){ exit(0); }
-#define SHMEMSIZE 256
+#define SHMEMSIZE 260
 unsigned char *memarea;
 
 void usage( void ) {
@@ -51,7 +51,18 @@ void getMidiData( double deltatime, std::vector< unsigned char > *mesg, void *)
     unsigned int val = mesg->at(2);         // key velocity ot control value
     if (type==0x80) memarea[num] = 0;       // note off
     if (type==0x90) memarea[num] = val;     // note on (and off if 0)
+    //if (type==0xa0) memarea[num] = val;     // polyphonic aftertouch (updates key vel)
     if (type==0xb0) memarea[128+num] = val; // control change
+    if (type==0xe0) {                       // pitch bend
+      memarea[256] = val>>1;
+      memarea[257] = num + (val&1)<<7;
+    }
+  }
+  if (nBytes==2) {
+    unsigned int type = mesg->at(0) & 0xf0; // ignore channel number ("OMNI" mode)
+    unsigned int val = mesg->at(1);         // key velocity ot control value
+    if (type==0xc0) memarea[258] = val;     // program change
+    if (type==0xd0) memarea[259] = val;     // channel pressure aftertouch
   }
 }
 
