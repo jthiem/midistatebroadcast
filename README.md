@@ -4,7 +4,7 @@ midistatebroadcast
 A small program that captures MIDI information and makes it available to other processes, using shared memory.
 
 To compile:
-- have RtMidi http://www.music.mcgill.ca/~gary/rtmidi/ instaliled
+- have RtMidi http://www.music.mcgill.ca/~gary/rtmidi/ installed
   (I used 2.1)
 - g++ -o midistatebroadcast midistatebroadcast.cpp -lrtmidi
 
