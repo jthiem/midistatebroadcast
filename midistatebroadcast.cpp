@@ -34,8 +34,9 @@ unsigned char *memarea;
 void usage( void ) {
   // Error function in case of incorrect command-line
   // argument specifications.
-  std::cout << "\nusage: midicctmp \n";
-  std::cout << "    where port = the device to use (default = 0).\n\n";
+  std::cout << "\nusage: midistatebroadcast port smfile \n";
+  std::cout << "    where port = the device to use (default = 0),\n";
+  std::cout << "    and smfile = the location and name of the file used to communicate with other processes (default = './midistate').\n\n";
   exit( 0 );
 }
 
@@ -75,10 +76,12 @@ int main( int argc, char *argv[] )
   int f;
 
   // Minimal command-line check.
-  if ( argc > 2 ) usage();
+  if ( argc > 3 ) usage();
 
-  // try to open file in /tmp for the shared memory
-  f = open( "/tmp/midibroadcast", O_CREAT|O_RDWR, S_IRUSR|S_IWUSR );
+  // try to open a file for the shared memory
+  char *f_name = "midistate";
+  if ( argc > 2 ) f_name = argv[2];
+  f = open( f_name, O_CREAT|O_RDWR, S_IRUSR|S_IWUSR );
   lseek( f, SHMEMSIZE-1, SEEK_SET );
   write( f, "", 1 );
   lseek( f, 0, SEEK_SET );
@@ -104,7 +107,7 @@ int main( int argc, char *argv[] )
   for (; port<nPorts; port++)
     std::cout << port << ": " << midiin->getPortName( port ) << "\n";
   port = 0;
-  if ( argc == 2 ) port = (unsigned int) atoi( argv[1] );
+  if ( argc > 1 ) port = (unsigned int) atoi( argv[1] );
   if ( port >= nPorts ) {
     delete midiin;
     std::cout << "Invalid port specifier!\n";
